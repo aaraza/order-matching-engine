@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class SymbolRetrievalServiceTest {
 
-    private static final SymbolRetrievalService service = new SymbolRetrievalService();
 
     @BeforeAll
     static void verifyApiKeyIsSet() {
@@ -24,8 +23,10 @@ class SymbolRetrievalServiceTest {
 
     @Test
     void fetchSymbols() throws IOException, InterruptedException {
-        Map<String, Symbol> symbols = service.fetchSymbols();
-        assertFalse(symbols.isEmpty(), "Expected at least one symbol from FinnHub");
+        SymbolRetrievalService.initialize();
+        SymbolRetrievalService symbolRetrievalService = SymbolRetrievalService.getInstance();
+        Map<String, Symbol> symbols = symbolRetrievalService.getSymbols();
+        assertFalse(symbols.isEmpty(), "Expected at-least one symbol from FINNHUB");
     }
 
 }
