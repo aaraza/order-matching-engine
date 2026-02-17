@@ -9,3 +9,7 @@ target/
 
 ### Mac OS ###
 .DS_Store
+
+### Cached Files
+src/main/resources/symbols.csv
+

@@ -83,12 +83,24 @@ public class SymbolRetrievalService {
     }
 
     /**
-     * Fetches the list of valid symbols available for trading on US exchanges.
+     * Returns symbols from the local CSV cache if it is less than 24 hours old,
+     * otherwise fetches fresh data from the FinnHub API and updates the cache.
      * @return A map containing list of Symbols being traded on US exchanges. Key = Ticker name; Value = {@link Symbol}
      * @throws IOException If FinnHub API call returns a non 200 status code or there is an IO error while sending the request
      * @throws InterruptedException If FinnHub API call is interrupted
      */
     private static Map<String, Symbol> fetchSymbols() throws IOException, InterruptedException {
+        if (SymbolCache.isCacheValid()) {
+            System.out.println("Reading Symbols from cache");
+            return SymbolCache.readCache();
+        }
+        Map<String, Symbol> symbols = fetchFromFinnHub();
+        SymbolCache.writeCache(symbols);
+        return symbols;
+    }
+
+    private static Map<String, Symbol> fetchFromFinnHub() throws IOException, InterruptedException {
+        System.out.println("Finnhub cache invalid. Making API call");
         HttpRequest httpRequest = createHttpRequest();
         HttpResponse<InputStream> response = HTTP_CLIENT.send(httpRequest, HttpResponse.BodyHandlers.ofInputStream());
         return processFinnHubResponse(response);
